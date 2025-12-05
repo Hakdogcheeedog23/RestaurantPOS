@@ -25,8 +25,15 @@ public class Login {
             System.out.println("2. Login");
             System.out.println("3. Exit");
             System.out.print("Choose an option: ");
-            int choice = s.nextInt();
-            s.nextLine();
+
+            int choice;
+
+            try {
+                choice = Integer.parseInt(s.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Enter a number.");
+                continue;
+            }
 
             switch (choice) {
                 case 1:
@@ -59,28 +66,34 @@ public class Login {
 
     private static void loadAccounts() {
         File file = new File(FILE_NAME);
-        if (!file.exists())
-            return;
+        if (!file.exists()) return;
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",", 2);
-                if (parts.length == 2) {
+                if (parts.length == 2)
                     accounts.add(new User(parts[0], parts[1]));
-                }
             }
         } catch (IOException e) {
-            System.out.println("Error loading accounts: " + e.getMessage());
+            System.out.println("Cannot load the account: " + e.getMessage());
         }
     }
 
     private static void register() {
-        System.out.println("Register a new account:");
         System.out.print("Create username: ");
         String newUsername = s.nextLine();
+
+        for (User user : accounts) {
+            if (user.username.equals(newUsername)) {
+                System.out.println("Username already exists! Try again.");
+                return;
+            }
+        }
+
         System.out.print("Create password: ");
         String newPassword = s.nextLine();
+
         accounts.add(new User(newUsername, newPassword));
         System.out.println("Registration successful!");
     }
@@ -99,10 +112,9 @@ public class Login {
             }
         }
 
-        if (loggedIn) {
+        if (loggedIn)
             System.out.println("Login successful!");
-        } else {
+        else
             System.out.println("Invalid username or password.");
-        }
     }
 }
